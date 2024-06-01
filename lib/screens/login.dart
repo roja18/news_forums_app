@@ -1,8 +1,11 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:news_and_forums/screens/admin_home.dart';
 import 'package:news_and_forums/screens/regster.dart';
+
+import 'component/reusable_widget.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,6 +15,8 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,34 +55,13 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    TextField(
-                      decoration: InputDecoration(
-                          suffixIcon: Icon(
-                            Icons.mail,
-                            color: Colors.grey,
-                          ),
-                          label: Text(
-                            "Gmail",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green),
-                          )),
-                    ),
-                    SizedBox(height: 15),
-                    TextField(
-                      decoration: InputDecoration(
-                          suffixIcon: Icon(
-                            Icons.key,
-                            color: Colors.grey,
-                          ),
-                          label: Text(
-                            "Password",
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.green),
-                          )),
-                    ),
-                    SizedBox(height: 20),
+                    reusableTextFild("Enter Email Address", Icons.mail, false,
+                        _emailController),
+                    const SizedBox(height: 15),
+                    reusableTextFild("Enter Password", Icons.mail, true,
+                        _passwordController),
+                    const SizedBox(height: 15),
+                    SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerRight,
                       child: Text(
@@ -87,32 +71,47 @@ class _LoginPageState extends State<LoginPage> {
                             color: Color.fromARGB(255, 4, 73, 7)),
                       ),
                     ),
-                    const SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: () {
+                    const SizedBox(height: 10),
+                    signInSignoutbutton(context, true, () {
+                      FirebaseAuth.instance
+                          .signInWithEmailAndPassword(
+                              email: _emailController.text,
+                              password: _passwordController.text)
+                          .then((value) {
+                        print("you login dude");
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => AdminHome()));
-                      },
-                      child: Container(
-                        height: 50,
-                        width: 300,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(30),
-                          color: Colors.lightGreen,
-                        ),
-                        child: const Center(
-                          child: Text(
-                            "LOGIN",
-                            style: TextStyle(
-                                fontSize: 25,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                      }).onError((error, stackTrace) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            behavior: SnackBarBehavior.floating,
+                            backgroundColor: Colors.transparent,
+                            elevation: 0,
+                            content: Container(
+                              padding: const EdgeInsets.all(16),
+                              height: 90,
+                              decoration: const BoxDecoration(
+                                color: Color.fromARGB(255, 219, 30, 17),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20)),
+                              ),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Error",
+                                      style: TextStyle(fontSize: 18),
+                                    ),
+                                    Text("Error ${error.toString()}"),
+                                  ]),
+                            ),
                           ),
-                        ),
-                      ),
-                    ),
+                        ); // ));
+                        // print("Error ${error.toString()}");
+                      });
+                    }),
                     const SizedBox(height: 30),
                     Align(
                       alignment: Alignment.centerRight,
