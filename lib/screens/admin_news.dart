@@ -62,7 +62,7 @@ class _AdminNewsState extends State<AdminNews> {
                               child: Row(
                                 children: [
                                   Image.asset(
-                                    'image/new.avif',
+                                    'image/newz.png',
                                     width: 100,
                                   ),
                                   const SizedBox(width: 5),

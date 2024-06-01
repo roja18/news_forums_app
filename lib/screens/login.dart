@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -17,7 +18,7 @@ class _LoginPageState extends State<LoginPage> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
   @override
-  signIn() {}
+  // signIn() {}
   Widget build(BuildContext context) {
     return Scaffold(
         body: Stack(
@@ -71,11 +72,23 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ),
                     signInSignoutbutton(context, true, () {
-                      signIn().then((value) {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (context) {
+                          return Center(child: CircularProgressIndicator());
+                        },
+                      );
+                      FirebaseAuth.instance
+                          .signInWithEmailAndPassword(
+                              email: _emailController.text,
+                              password: _passwordController.text)
+                          .then((value) {
+                        print("you login dude");
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => LoginPage()));
+                                builder: (context) => AdminHome()));
                       }).onError((error, stackTrace) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -101,7 +114,8 @@ class _LoginPageState extends State<LoginPage> {
                                   ]),
                             ),
                           ),
-                        );
+                        ); // ));
+                        // print("Error ${error.toString()}");
                       });
                     }),
                     const SizedBox(height: 5),
@@ -121,10 +135,10 @@ class _LoginPageState extends State<LoginPage> {
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => Regster()));
+                                      builder: (context) => Register()));
                             },
                             child: Text(
-                              ' Regster',
+                              ' Register',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   color: Color.fromARGB(255, 2, 29, 3)),
