@@ -112,3 +112,40 @@ Container signInSignoutbutton(
     ),
   );
 }
+
+class ReusableTextareaFild extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final IconData icon;
+  final bool isPasswordType;
+
+  ReusableTextareaFild({
+    required this.controller,
+    required this.hintText,
+    required this.icon,
+    this.isPasswordType = false,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+      decoration: BoxDecoration(
+        color: Colors.grey[200],
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: TextFormField(
+        controller: controller,
+        obscureText: isPasswordType,
+        maxLines: null, // Allow unlimited number of lines
+        keyboardType: TextInputType.multiline, // Enable multiline input
+        decoration: InputDecoration(
+          hintText: hintText,
+          hintStyle: TextStyle(color: Colors.grey),
+          border: InputBorder.none,
+          icon: Icon(icon),
+        ),
+      ),
+    );
+  }
+}
