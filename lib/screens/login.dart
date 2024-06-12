@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:news_and_forums/screens/admin_home.dart';
 import 'package:news_and_forums/screens/regster.dart';
 
 import 'component/reusable_widget.dart';
+import 'home.dart';
+import 'home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -24,7 +27,7 @@ class _LoginPageState extends State<LoginPage> {
         Container(
           height: double.infinity,
           width: double.infinity,
-          decoration: BoxDecoration(color: Colors.lightGreen),
+          decoration: const BoxDecoration(color: Colors.lightGreen),
           child: const Padding(
             padding: EdgeInsets.only(top: 100.0, left: 22.0),
             child: Text(
@@ -49,7 +52,7 @@ class _LoginPageState extends State<LoginPage> {
             height: double.infinity,
             width: double.infinity,
             child: Padding(
-              padding: EdgeInsets.only(top: 40, left: 28.0, right: 28.0),
+              padding: const EdgeInsets.only(top: 40, left: 28.0, right: 28.0),
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -60,7 +63,7 @@ class _LoginPageState extends State<LoginPage> {
                     reusableTextFild("Enter Password", Icons.mail, true,
                         _passwordController),
                     const SizedBox(height: 15),
-                    Align(
+                    const Align(
                       alignment: Alignment.centerRight,
                       child: Text(
                         'Forget Password',
@@ -81,13 +84,45 @@ class _LoginPageState extends State<LoginPage> {
                           .signInWithEmailAndPassword(
                               email: _emailController.text,
                               password: _passwordController.text)
-                          .then((value) {
-                        print("you login dude");
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => AdminHome()));
+                          .then((value) async {
+                        // Fetch the user type from Firestore
+                        User? user = FirebaseAuth.instance.currentUser;
+                        if (user != null) {
+                          DocumentSnapshot userDoc = await FirebaseFirestore
+                              .instance
+                              .collection('users')
+                              .doc(user.uid)
+                              .get();
+                          String userType = userDoc['usertype'];
+
+                          Navigator.pop(context); // Close the progress dialog
+
+                          // Navigate to the appropriate page based on user type
+                          if (userType == 'User') {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => HomeScreen()));
+                          } else if (userType == 'Admin') {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => NewsPage()));
+                          } else if (userType == 'SupperUser') {
+                            Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => AdminHome()));
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Unknown user type'),
+                              ),
+                            );
+                          }
+                        }
                       }).onError((error, stackTrace) {
+                        Navigator.pop(context); // Close the progress dialog
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             behavior: SnackBarBehavior.floating,
@@ -104,7 +139,7 @@ class _LoginPageState extends State<LoginPage> {
                               child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
+                                    const Text(
                                       "Error",
                                       style: TextStyle(fontSize: 18),
                                     ),
@@ -112,8 +147,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ]),
                             ),
                           ),
-                        ); // ));
-                        // print("Error ${error.toString()}");
+                        );
                       });
                     }),
                     const SizedBox(height: 5),
@@ -122,7 +156,7 @@ class _LoginPageState extends State<LoginPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
+                          const Text(
                             'I don\'t have an Account',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -135,7 +169,7 @@ class _LoginPageState extends State<LoginPage> {
                                   MaterialPageRoute(
                                       builder: (context) => Register()));
                             },
-                            child: Text(
+                            child: const Text(
                               ' Register',
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,

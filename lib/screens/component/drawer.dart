@@ -1,5 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:news_and_forums/screens/login.dart';
 
 class MyDrawer extends StatelessWidget {
@@ -18,19 +18,6 @@ class MyDrawer extends StatelessWidget {
             ),
             child: null,
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-              );
-            },
-            child: ListTile(
-              leading: const Icon(Icons.login_rounded),
-              title: const Text('Login'),
-              onTap: () {},
-            ),
-          ),
           ListTile(
             leading: const Icon(Icons.account_circle),
             title: const Text('Profile'),
@@ -40,6 +27,18 @@ class MyDrawer extends StatelessWidget {
             leading: const Icon(Icons.settings),
             title: const Text('Settings'),
             onTap: () {},
+          ),
+          ListTile(
+            leading: const Icon(Icons.logout),
+            title: const Text('Log Out'),
+            onTap: () {
+              FirebaseAuth.instance.signOut().then((value) {
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => LoginPage()),
+                  (Route<dynamic> route) => false,
+                );
+              });
+            },
           ),
         ],
       ),

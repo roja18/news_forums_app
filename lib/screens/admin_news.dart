@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart'; // Import Firestore library
+import 'package:flutter/widgets.dart';
 import 'package:intl/intl.dart'; // Import intl library for date formatting
 import 'package:news_and_forums/screens/admin_add_news.dart';
 
@@ -11,6 +12,18 @@ class AdminNews extends StatefulWidget {
 }
 
 class _AdminNewsState extends State<AdminNews> {
+  void _deleteNews(String docId) {
+    FirebaseFirestore.instance.collection('news').doc(docId).delete().then((_) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('News deleted successfully')),
+      );
+    }).catchError((error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete news: $error')),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -99,13 +112,24 @@ class _AdminNewsState extends State<AdminNews> {
                                     children: [
                                       Text(news[
                                           'content']), // Display news content
-                                      Row(
-                                        children: [
-                                          Text(
-                                            formattedDate,
-                                            style: TextStyle(color: Colors.green),
-                                          ),
-                                        ],
+                                      SingleChildScrollView(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              formattedDate,
+                                              style: TextStyle(
+                                                  color: Colors.green),
+                                            ),
+                                            IconButton(
+                                                onPressed: () {
+                                                  _deleteNews(news.id);
+                                                },
+                                                icon: Icon(Icons.delete,
+                                                    color: Colors.red)),
+                                          ],
+                                        ),
                                       ), // Display formatted date
                                     ],
                                   ),

@@ -1,9 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:news_and_forums/screens/admin_news.dart';
 
+import 'admin_view_users.dart';
 import 'login.dart';
 
 class AdminHome extends StatefulWidget {
@@ -123,26 +125,35 @@ class _AdminHomeState extends State<AdminHome> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  Card(
-                                    child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 10),
-                                        height: 120,
-                                        // width: MediaQuery.of(context).size.width,
-                                        width: 130,
-                                        child:
-                                            Image.asset('image/request.webp')),
-                                  ),
-                                  const Text(
-                                    'Admin',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              AdminViewUsers()));
+                                },
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Card(
+                                      child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 10),
+                                          height: 120,
+                                          // width: MediaQuery.of(context).size.width,
+                                          width: 130,
+                                          child: Image.asset(
+                                              'image/request.webp')),
+                                    ),
+                                    const Text(
+                                      'Users',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
                               ),
                               const SizedBox(
                                 width: 16,
