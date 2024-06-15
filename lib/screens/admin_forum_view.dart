@@ -1,9 +1,91 @@
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
-class ForumSection extends StatelessWidget {
-  const ForumSection({super.key});
+class AdminForum extends StatefulWidget {
+  const AdminForum({super.key});
+
+  @override
+  State<AdminForum> createState() => _AdminForumState();
+}
+
+class _AdminForumState extends State<AdminForum> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(children: [
+        Container(
+          height: double.infinity,
+          width: double.infinity,
+          decoration: const BoxDecoration(color: Colors.lightGreen),
+          child: const Padding(
+            padding: EdgeInsets.only(top: 80.0, left: 22.0),
+            child: Text(
+              "ATC \nNews & Forum",
+              style: TextStyle(
+                  fontSize: 35,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 200.0),
+          child: Container(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(40),
+                topRight: Radius.circular(40),
+              ),
+              color: Colors.white70,
+            ),
+            height: double.infinity,
+            width: double.infinity,
+            child: Padding(
+              padding: const EdgeInsets.only(top: 40.0, left: 8.0, right: 8.0),
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SectionHeader(title: 'Forum Post', color: Colors.green),
+                    SizedBox(height: 10.0),
+                    AdminForumSection(),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ]),
+    );
+  }
+}
+
+class SectionHeader extends StatelessWidget {
+  final String title;
+  final Color color;
+
+  const SectionHeader({
+    Key? key,
+    required this.title,
+    required this.color,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 24.0,
+        fontWeight: FontWeight.bold,
+        color: color,
+      ),
+    );
+  }
+}
+
+class AdminForumSection extends StatelessWidget {
+  const AdminForumSection({super.key});
 
   @override
   Widget build(BuildContext context) {

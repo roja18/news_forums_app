@@ -1,10 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:news_and_forums/screens/admin_news.dart';
 
+import 'admin_forum_view.dart';
+import 'admin_profile.dart';
 import 'admin_view_users.dart';
 import 'login.dart';
 
@@ -94,23 +95,31 @@ class _AdminHomeState extends State<AdminHome> {
                               const SizedBox(
                                 width: 16,
                               ),
-                              Column(
-                                children: [
-                                  Card(
-                                    child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 10),
-                                        height: 120,
-                                        width: 130,
-                                        child: Image.asset('image/top.webp')),
-                                  ),
-                                  const Text(
-                                    'Forums',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => AdminForum()));
+                                },
+                                child: Column(
+                                  children: [
+                                    Card(
+                                      child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 10),
+                                          height: 120,
+                                          width: 130,
+                                          child: Image.asset('image/top.webp')),
+                                    ),
+                                    const Text(
+                                      'Forums',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
                               ),
                             ],
                           ),
@@ -143,8 +152,8 @@ class _AdminHomeState extends State<AdminHome> {
                                           height: 120,
                                           // width: MediaQuery.of(context).size.width,
                                           width: 130,
-                                          child: Image.asset(
-                                              'image/request.webp')),
+                                          child:
+                                              Image.asset('image/users.png')),
                                     ),
                                     const Text(
                                       'Users',
@@ -158,23 +167,33 @@ class _AdminHomeState extends State<AdminHome> {
                               const SizedBox(
                                 width: 16,
                               ),
-                              Column(
-                                children: [
-                                  Card(
-                                    child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 20, vertical: 10),
-                                        height: 120,
-                                        width: 130,
-                                        child: Image.asset('image/forum2.jpg')),
-                                  ),
-                                  const Text(
-                                    'Other',
-                                    style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold),
-                                  )
-                                ],
+                              GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              AdminProfile()));
+                                },
+                                child: Column(
+                                  children: [
+                                    Card(
+                                      child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 10),
+                                          height: 120,
+                                          width: 130,
+                                          child: Image.asset(
+                                              'image/request.webp')),
+                                    ),
+                                    const Text(
+                                      'Profile',
+                                      style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold),
+                                    )
+                                  ],
+                                ),
                               ),
                             ],
                           ),

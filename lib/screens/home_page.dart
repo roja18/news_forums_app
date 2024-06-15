@@ -1,4 +1,8 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:news_and_forums/screens/soateco_forum.dart';
+
+import 'component/soateco_drawer.dart';
 
 class NewsPage extends StatefulWidget {
   const NewsPage({super.key});
@@ -10,162 +14,226 @@ class NewsPage extends StatefulWidget {
 class _NewsPageState extends State<NewsPage> {
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Padding(
-          //   padding: const EdgeInsets.symmetric(horizontal: 2.0),
-          //   child: Container(
-          //     padding: const EdgeInsets.all(15.0),
-          //     height: 180,
-          //     decoration: BoxDecoration(
-          //       image: const DecorationImage(
-          //         image: AssetImage('image/top.webp'),
-          //         fit: BoxFit.cover, // Set fit to cover the entire container
-          //       ),
-          //       color: Colors.white,
-          //       borderRadius: BorderRadius.circular(20.0),
-          //       boxShadow: [
-          //         BoxShadow(
-          //           color: Colors.grey.shade200,
-          //           offset: const Offset(0, 4),
-          //           blurRadius: 10.0,
-          //         ),
-          //       ],
-          //     ),
-          //     child: null, // You can remove the child if not needed
-          //   ),
-          // ),
-          // const SizedBox(
-          //   height: 20,
-          // ),
-          const Padding(
-            padding: EdgeInsets.only(top: 20.0, left: 20.0, right: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(
+          'ATC News & Forum App',
+          style: TextStyle(fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.green,
+      ),
+      body: const Padding(
+        padding: EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SectionHeader(title: 'News', color: Colors.blue),
+              SizedBox(height: 10.0),
+              NewsSection(),
+              SizedBox(height: 20.0),
+              SectionHeader(title: 'Forum Post', color: Colors.green),
+              SizedBox(height: 10.0),
+              SoaForumSection(),
+            ],
+          ),
+        ),
+      ),
+      drawer: SoatecoDrawer(),
+    );
+  }
+}
+class SectionHeader extends StatelessWidget {
+  final String title;
+  final Color color;
+
+  const SectionHeader({
+    Key? key,
+    required this.title,
+    required this.color,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      title,
+      style: TextStyle(
+        fontSize: 24.0,
+        fontWeight: FontWeight.bold,
+        color: color,
+      ),
+    );
+  }
+}
+
+class NewsSection extends StatelessWidget {
+  const NewsSection({super.key});
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 200.0,
+      child: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance.collection('news').snapshots(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Error: ${snapshot.error}'));
+          }
+          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+            return Center(child: Text('No news articles available'));
+          }
+
+          var newsDocs = snapshot.data!.docs;
+
+          return ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: newsDocs.length,
+            itemBuilder: (context, index) {
+              var news = newsDocs[index];
+              return NewsCard(
+                title: news['title'],
+                content: news['content'],
+                timestamp: news['timestamp'],
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class NewsCard extends StatelessWidget {
+  final String title;
+  final String content;
+  final Timestamp timestamp;
+
+  const NewsCard({
+    super.key,
+    required this.title,
+    required this.content,
+    required this.timestamp,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => NewsDetailPage(
+              title: title,
+              content: content,
+              timestamp: timestamp,
+            ),
+          ),
+        );
+      },
+      child: Container(
+        width: 150.0,
+        margin: const EdgeInsets.only(right: 16.0),
+        child: Card(
+          elevation: 4.0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                Text(
-                  'News and Event',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                Expanded(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      image: DecorationImage(
+                        image: AssetImage('image/atc.png'),
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
                 ),
+                SizedBox(height: 8.0),
                 Text(
-                  'View all',
-                  style: TextStyle(color: Colors.purple),
-                )
+                  title,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ],
             ),
           ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
+        ),
+      ),
+    );
+  }
+}
+
+class NewsDetailPage extends StatelessWidget {
+  final String title;
+  final String content;
+  final Timestamp timestamp;
+
+  const NewsDetailPage({
+    Key? key,
+    required this.title,
+    required this.content,
+    required this.timestamp,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('News Details'),
+        backgroundColor: Colors.lightGreen,
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: SingleChildScrollView(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(18.0),
+              child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Card(
-                          child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('image/latest.avif'),
-                            fit: BoxFit
-                                .cover, // Set fit to cover the entire container
-                          ),
-                        ),
-                        height: 400,
-                        width: 300,
-                      )),
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Card(
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            height: 400,
-                            width: 300,
-                            child: Image.asset('image/news.png')),
+                  Container(
+                    height: 200.0,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.0),
+                      image: DecorationImage(
+                        image: AssetImage('image/atc.png'),
+                        fit: BoxFit.cover,
                       ),
-                    ],
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    content,
+                    style: TextStyle(fontSize: 16.0),
+                  ),
+                  SizedBox(height: 8.0),
+                  Text(
+                    'Published on: ${timestamp.toDate()}',
+                    style: TextStyle(fontSize: 14.0, color: Colors.grey),
                   ),
                 ],
               ),
             ),
           ),
-          const SizedBox(
-            height: 20,
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 20.0, right: 10.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Forums',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'View all',
-                  style: TextStyle(color: Colors.purple),
-                )
-              ],
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Card(
-                          child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 10),
-                        decoration: const BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage('image/forum.jpg'),
-                            fit: BoxFit
-                                .cover, // Set fit to cover the entire container
-                          ),
-                        ),
-                        height: 400,
-                        width: 300,
-                      )),
-                    ],
-                  ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      // ListTile(
-                      //   trailing: ,
-                      // )
-                      Card(
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 20, vertical: 10),
-                            height: 400,
-                            width: 300,
-                            child: Image.asset('image/forum2.jpg')),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

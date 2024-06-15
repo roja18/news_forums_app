@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-
 import 'component/drawer.dart';
 import 'forums.dart';
-import 'forums_post.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -38,20 +36,20 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       drawer: const MyDrawer(),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () {
-          Navigator.push(
-              context, MaterialPageRoute(builder: (context) => FormPost()));
-        },
-        label: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text("Post"),
-            SizedBox(width: 5), // Add some space between the text and the icon
-            Icon(Icons.post_add),
-          ],
-        ),
-      ),
+      // floatingActionButton: FloatingActionButton.extended(
+      //   onPressed: () {
+      //     Navigator.push(context,
+      //         MaterialPageRoute(builder: (context) => SoatecoFormPost()));
+      //   },
+      //   label: Row(
+      //     mainAxisAlignment: MainAxisAlignment.center,
+      //     children: const [
+      //       Text("Post"),
+      //       SizedBox(width: 5), // Add some space between the text and the icon
+      //       Icon(Icons.post_add),
+      //     ],
+      //   ),
+      // ),
     );
   }
 }
