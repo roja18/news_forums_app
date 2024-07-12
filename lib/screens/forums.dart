@@ -61,6 +61,7 @@ class ForumCard extends StatefulWidget {
 class _ForumCardState extends State<ForumCard> {
   bool isLiked = false;
   int likeCount = 0;
+  bool showComments = false;
   TextEditingController _commentController = TextEditingController();
 
   @override
@@ -226,9 +227,13 @@ class _ForumCardState extends State<ForumCard> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        showComments = !showComments;
+                      });
+                    },
                     icon: Icon(Icons.chat_bubble),
-                  ),
+                  ), // hide the comment show when user click this comment icon
                 ],
               ),
               Row(
@@ -252,71 +257,75 @@ class _ForumCardState extends State<ForumCard> {
                 ],
               ),
               Divider(),
-              Column(
-                children: [
-                  TextField(
-                    controller: _commentController,
-                    decoration: InputDecoration(
-                      hintText: 'Add a comment...',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: _addComment,
+              if (showComments) ...[
+                Column(
+                  children: [
+                    TextField(
+                      controller: _commentController,
+                      decoration: InputDecoration(
+                        hintText: 'Add a comment...',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: _addComment,
+                        ),
                       ),
                     ),
-                  ),
-                  StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('forum')
-                        .doc(widget.postId)
-                        .collection('forumcomment')
-                        .orderBy('timestamp', descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(child: CircularProgressIndicator());
-                      }
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('forum')
+                          .doc(widget.postId)
+                          .collection('forumcomment')
+                          .orderBy('timestamp', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(child: CircularProgressIndicator());
+                        }
 
-                      var comments = snapshot.data!.docs;
+                        var comments = snapshot.data!.docs;
 
-                      return ListView(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        children: comments.map((doc) {
-                          var commentData = doc.data() as Map<String, dynamic>;
-                          var uid = commentData['uid'];
-                          var comment = commentData['comment'];
-                          var timestamp =
-                              (commentData['timestamp'] as Timestamp).toDate();
+                        return ListView(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: comments.map((doc) {
+                            var commentData =
+                                doc.data() as Map<String, dynamic>;
+                            var uid = commentData['uid'];
+                            var comment = commentData['comment'];
+                            var timestamp =
+                                (commentData['timestamp'] as Timestamp)
+                                    .toDate();
 
-                          return ListTile(
-                            title: FutureBuilder<String>(
-                              future: _getFullName(uid),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Text('Loading...');
-                                }
-                                return Text(snapshot.data!);
-                              },
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(comment),
-                                Text(
-                                  '${timestamp.toLocal()}'.split(' ')[0],
-                                  style: TextStyle(
-                                      fontSize: 12.0, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                            return ListTile(
+                              title: FutureBuilder<String>(
+                                future: _getFullName(uid),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Text('Loading...');
+                                  }
+                                  return Text(snapshot.data!);
+                                },
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(comment),
+                                  Text(
+                                    '${timestamp.toLocal()}'.split(' ')[0],
+                                    style: TextStyle(
+                                        fontSize: 12.0, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

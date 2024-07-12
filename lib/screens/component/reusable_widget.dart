@@ -1,89 +1,106 @@
 import 'package:flutter/material.dart';
 
-TextFormField reusableTextFild(String text, IconData icon, bool isPasswordType,
-    TextEditingController controller) {
-  return TextFormField(
-    autovalidateMode: AutovalidateMode.onUserInteraction,
-    validator: isPasswordType
-        ? (value) {
-            if (value == null || value.isEmpty) {
-              return 'Please enter your password';
-            }
+class ReusableTextField extends StatefulWidget {
+  final String text;
+  final IconData icon;
+  final bool isPasswordType;
+  final TextEditingController controller;
 
-            if (value.length < 6) {
-              return 'Password must be at least 6 characters';
-            }
-            return null;
-          }
-        : (value) {
-            // add email validation
-            if (text == 'Enter Email Address') {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your email';
-              }
+  const ReusableTextField({
+    required this.text,
+    required this.icon,
+    required this.isPasswordType,
+    required this.controller,
+  });
 
-              bool emailValid = RegExp(
-                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                  .hasMatch(value);
-              if (!emailValid) {
-                return 'Please enter a valid email';
-              }
-
-              return null;
-            }
-            if (text == 'Enter FullName') {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your full name';
-              }
-
-              if (value.length < 6) {
-                return 'Fullname must be at least 10 characters';
-              }
-              return null;
-            }
-            if (text == 'Enter Regstration Number') {
-              if (value == null || value.isEmpty) {
-                return 'Please enter your regstration number';
-              }
-
-              if (value.length < 6) {
-                return 'Phone number must be at least 10 characters';
-              }
-              return null;
-            }
-            return null;
-            
-          },
-    controller: controller,
-    obscureText: isPasswordType,
-    enableSuggestions: !isPasswordType,
-    
-    // autovalidateMode: AutovalidateMode.onUserInteraction,
-    autocorrect: !isPasswordType,
-    cursorColor: Colors.black,
-    style: TextStyle(color: Color.fromARGB(255, 4, 56, 145).withOpacity(0.9)),
-    decoration: InputDecoration(
-      prefixIcon: Icon(
-        icon,
-        color: Colors.lightGreen,
-      ),
-
-      labelText: text,
-      // hintText: hint,
-      labelStyle: TextStyle(color: Colors.black.withOpacity(0.9)),
-      filled: true,
-      floatingLabelBehavior: FloatingLabelBehavior.never,
-      fillColor: Colors.white38,
-      border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(20.0),
-          borderSide: const BorderSide(width: 0, style: BorderStyle.none)),
-    ),
-    keyboardType: isPasswordType
-        ? TextInputType.visiblePassword
-        : TextInputType.emailAddress,
-  );
+  @override
+  _ReusableTextFieldState createState() => _ReusableTextFieldState();
 }
 
+class _ReusableTextFieldState extends State<ReusableTextField> {
+  bool isObscure = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (value) {
+        if (widget.isPasswordType) {
+          if (value == null || value.isEmpty) {
+            return 'Please enter your password';
+          }
+          if (value.length < 6) {
+            return 'Password must be at least 6 characters';
+          }
+        } else {
+          if (widget.text == 'Enter Email Address') {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your email';
+            }
+            bool emailValid = RegExp(
+                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                .hasMatch(value);
+            if (!emailValid) {
+              return 'Please enter a valid email';
+            }
+          } else if (widget.text == 'Enter FullName') {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your full name';
+            }
+            if (value.length < 10) {
+              return 'Fullname must be at least 10 characters';
+            }
+          } else if (widget.text == 'Enter Registration Number') {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your registration number';
+            }
+            if (value.length < 10) {
+              return 'Registration number must be at least 10 characters';
+            }
+          }
+        }
+        return null;
+      },
+      controller: widget.controller,
+      obscureText: widget.isPasswordType ? isObscure : false,
+      enableSuggestions: !widget.isPasswordType,
+      autocorrect: !widget.isPasswordType,
+      cursorColor: Colors.black,
+      style: TextStyle(color: Color.fromARGB(255, 4, 56, 145).withOpacity(0.9)),
+      decoration: InputDecoration(
+        prefixIcon: Icon(
+          widget.icon,
+          color: Colors.lightGreen,
+        ),
+        suffixIcon: widget.isPasswordType
+            ? IconButton(
+                icon: Icon(
+                  isObscure ? Icons.visibility_off : Icons.visibility,
+                  color: Colors.black45,
+                ),
+                onPressed: () {
+                  setState(() {
+                    isObscure = !isObscure;
+                  });
+                },
+              )
+            : null,
+        labelText: widget.text,
+        labelStyle: TextStyle(color: Colors.black.withOpacity(0.9)),
+        filled: true,
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        fillColor: Colors.white38,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(20.0),
+          borderSide: const BorderSide(width: 0, style: BorderStyle.none),
+        ),
+      ),
+      keyboardType: widget.isPasswordType
+          ? TextInputType.visiblePassword
+          : TextInputType.emailAddress,
+    );
+  }
+}
 Container signInSignoutbutton(
     BuildContext context, bool isLogin, Function onTap) {
   return Container(

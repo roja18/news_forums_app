@@ -57,11 +57,9 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    reusableTextFild("Enter Email Address", Icons.mail, false,
-                        _emailController),
+                    ReusableTextField(text: "Enter Email Address", icon: Icons.mail, isPasswordType: false, controller: _emailController),
                     const SizedBox(height: 15),
-                    reusableTextFild("Enter Password", Icons.mail, true,
-                        _passwordController),
+                    ReusableTextField(text: "Enter Password", icon: Icons.lock, isPasswordType: true, controller: _passwordController),
                     const SizedBox(height: 15),
                     const Align(
                       alignment: Alignment.centerRight,

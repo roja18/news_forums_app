@@ -157,21 +157,13 @@ class _RegisterState extends State<Register> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      reusableTextFild("Enter FullName", Icons.person, false,
-                          _fullnameController),
+                      ReusableTextField(text: "Enter FullName", icon: Icons.person, isPasswordType: false, controller: _fullnameController),
                       const SizedBox(height: 15),
-                      reusableTextFild(
-                        "Enter Registration Number",
-                        Icons.perm_identity_rounded,
-                        false,
-                        _registrationController,
-                      ),
+                      ReusableTextField(text: "Enter Registration Number", icon: Icons.perm_identity_rounded, isPasswordType: false, controller: _registrationController),
                       const SizedBox(height: 15),
-                      reusableTextFild("Enter Email Address", Icons.mail, false,
-                          _emailController),
+                      ReusableTextField(text: "Enter Email Address", icon: Icons.mail, isPasswordType: false, controller: _emailController),
                       const SizedBox(height: 15),
-                      reusableTextFild("Enter Password", Icons.lock, true,
-                          _passwordController),
+                      ReusableTextField(text: "Enter Password", icon: Icons.lock, isPasswordType: true, controller: _passwordController),
                       const SizedBox(height: 15),
                       signInSignoutbutton(context, false, () {
                         signUp();

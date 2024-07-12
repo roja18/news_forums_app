@@ -43,6 +43,7 @@ class _NewsPageState extends State<NewsPage> {
     );
   }
 }
+
 class SectionHeader extends StatelessWidget {
   final String title;
   final Color color;

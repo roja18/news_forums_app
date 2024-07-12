@@ -128,13 +128,13 @@ class ForumCard extends StatefulWidget {
   final String imageUrl;
 
   const ForumCard({
-    super.key,
+    Key? key,
     required this.postId,
     required this.uid,
     required this.timestamp,
     required this.description,
     required this.imageUrl,
-  });
+  }) : super(key: key);
 
   @override
   _ForumCardState createState() => _ForumCardState();
@@ -143,6 +143,7 @@ class ForumCard extends StatefulWidget {
 class _ForumCardState extends State<ForumCard> {
   bool isLiked = false;
   int likeCount = 0;
+  bool showComments = false;
   TextEditingController _commentController = TextEditingController();
 
   @override
@@ -235,6 +236,22 @@ class _ForumCardState extends State<ForumCard> {
     }
   }
 
+  Future<void> _deletePost() async {
+    try {
+      await FirebaseFirestore.instance
+          .collection('forum')
+          .doc(widget.postId)
+          .delete();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Post deleted successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to delete post')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -283,6 +300,14 @@ class _ForumCardState extends State<ForumCard> {
                       }
                     },
                   ),
+                  const Spacer(),
+                  IconButton(
+                    onPressed: _deletePost, // Call _deletePost method here
+                    icon: Icon(
+                      Icons.delete,
+                      color: Colors.red,
+                    ),
+                  ),
                 ],
               ),
               Text(
@@ -308,7 +333,11 @@ class _ForumCardState extends State<ForumCard> {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      setState(() {
+                        showComments = !showComments;
+                      });
+                    },
                     icon: Icon(Icons.chat_bubble),
                   ),
                 ],
@@ -334,71 +363,75 @@ class _ForumCardState extends State<ForumCard> {
                 ],
               ),
               Divider(),
-              Column(
-                children: [
-                  TextField(
-                    controller: _commentController,
-                    decoration: InputDecoration(
-                      hintText: 'Add a comment...',
-                      suffixIcon: IconButton(
-                        icon: Icon(Icons.send),
-                        onPressed: _addComment,
+              if (showComments) ...[
+                Column(
+                  children: [
+                    TextField(
+                      controller: _commentController,
+                      decoration: InputDecoration(
+                        hintText: 'Add a comment...',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.send),
+                          onPressed: _addComment,
+                        ),
                       ),
                     ),
-                  ),
-                  StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('forum')
-                        .doc(widget.postId)
-                        .collection('forumcomment')
-                        .orderBy('timestamp', descending: true)
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (!snapshot.hasData) {
-                        return Center(child: CircularProgressIndicator());
-                      }
+                    StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('forum')
+                          .doc(widget.postId)
+                          .collection('forumcomment')
+                          .orderBy('timestamp', descending: true)
+                          .snapshots(),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) {
+                          return Center(child: CircularProgressIndicator());
+                        }
 
-                      var comments = snapshot.data!.docs;
+                        var comments = snapshot.data!.docs;
 
-                      return ListView(
-                        shrinkWrap: true,
-                        physics: NeverScrollableScrollPhysics(),
-                        children: comments.map((doc) {
-                          var commentData = doc.data() as Map<String, dynamic>;
-                          var uid = commentData['uid'];
-                          var comment = commentData['comment'];
-                          var timestamp =
-                              (commentData['timestamp'] as Timestamp).toDate();
+                        return ListView(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          children: comments.map((doc) {
+                            var commentData =
+                                doc.data() as Map<String, dynamic>;
+                            var uid = commentData['uid'];
+                            var comment = commentData['comment'];
+                            var timestamp =
+                                (commentData['timestamp'] as Timestamp)
+                                    .toDate();
 
-                          return ListTile(
-                            title: FutureBuilder<String>(
-                              future: _getFullName(uid),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Text('Loading...');
-                                }
-                                return Text(snapshot.data!);
-                              },
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(comment),
-                                Text(
-                                  '${timestamp.toLocal()}'.split(' ')[0],
-                                  style: TextStyle(
-                                      fontSize: 12.0, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          );
-                        }).toList(),
-                      );
-                    },
-                  ),
-                ],
-              ),
+                            return ListTile(
+                              title: FutureBuilder<String>(
+                                future: _getFullName(uid),
+                                builder: (context, snapshot) {
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Text('Loading...');
+                                  }
+                                  return Text(snapshot.data!);
+                                },
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(comment),
+                                  Text(
+                                    '${timestamp.toLocal()}'.split(' ')[0],
+                                    style: TextStyle(
+                                        fontSize: 12.0, color: Colors.grey),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }).toList(),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ],
             ],
           ),
         ),

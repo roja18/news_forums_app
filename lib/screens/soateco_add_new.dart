@@ -77,12 +77,11 @@ class _SoatecoAddNewsState extends State<SoatecoAddNews> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  reusableTextFild(
-                    "Enter News Title",
-                    Icons.newspaper,
-                    false,
-                    _newsController,
-                  ),
+                  ReusableTextField(
+                      text: "Enter News Title",
+                      icon: Icons.newspaper,
+                      isPasswordType: false,
+                      controller: _newsController),
                   const SizedBox(height: 15),
                   ReusableTextareaFild(
                     controller: _textEditingController,

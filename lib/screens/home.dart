@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/services.dart';
+import 'package:printing/printing.dart';
 import 'component/drawer.dart';
 import 'forums.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,8 +22,8 @@ class _HomeScreenState extends State<HomeScreen> {
         title: Text('ATC News & Forum App'),
         backgroundColor: Colors.lightGreen,
       ),
-      body: const Padding(
-        padding: EdgeInsets.all(16.0),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,6 +83,7 @@ class SectionHeader extends StatelessWidget {
 
 class NewsSection extends StatelessWidget {
   const NewsSection({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -196,6 +201,57 @@ class NewsDetailPage extends StatelessWidget {
     required this.timestamp,
   }) : super(key: key);
 
+  Future<void> _downloadPDF(BuildContext context) async {
+    final pdf = pw.Document();
+
+    final imageBytes =
+        (await rootBundle.load('image/atc.png')).buffer.asUint8List();
+
+    pdf.addPage(
+      pw.Page(
+        build: (pw.Context context) {
+          return pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.start,
+            children: [
+              pw.Container(
+                height: 200.0,
+                decoration: pw.BoxDecoration(
+                  borderRadius: pw.BorderRadius.circular(16.0),
+                  image: pw.DecorationImage(
+                    image: pw.MemoryImage(imageBytes),
+                    fit: pw.BoxFit.cover,
+                  ),
+                ),
+              ),
+              pw.SizedBox(height: 16.0),
+              pw.Text(
+                title,
+                style: pw.TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: pw.FontWeight.bold,
+                ),
+              ),
+              pw.SizedBox(height: 8.0),
+              pw.Text(
+                content,
+                style: pw.TextStyle(fontSize: 16.0),
+              ),
+              pw.SizedBox(height: 8.0),
+              pw.Text(
+                'Published on: ${timestamp.toDate()}',
+                style: pw.TextStyle(fontSize: 14.0, color: PdfColors.grey),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+
+    await Printing.layoutPdf(
+      onLayout: (PdfPageFormat format) async => pdf.save(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -239,6 +295,10 @@ class NewsDetailPage extends StatelessWidget {
                   Text(
                     'Published on: ${timestamp.toDate()}',
                     style: TextStyle(fontSize: 14.0, color: Colors.grey),
+                  ),
+                  ElevatedButton(
+                    onPressed: () => _downloadPDF(context),
+                    child: Text("Download"),
                   ),
                 ],
               ),
