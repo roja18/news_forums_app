@@ -88,7 +88,6 @@ class _AdminAddNewsState extends State<AdminAddNews> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       ReusableTextField(text: "Enter News Title", icon: Icons.newspaper, isPasswordType: false, controller: _newsController),
-                     
                       const SizedBox(height: 15),
                       ReusableTextareaFild(
                         controller: _textEditingController,

@@ -5,6 +5,7 @@ import 'package:news_and_forums/screens/admin_home.dart';
 import 'package:news_and_forums/screens/regster.dart';
 
 import 'component/reusable_widget.dart';
+import 'forget_password.dart';
 import 'home.dart';
 import 'home_page.dart';
 
@@ -57,17 +58,33 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ReusableTextField(text: "Enter Email Address", icon: Icons.mail, isPasswordType: false, controller: _emailController),
+                    ReusableTextField(
+                        text: "Enter Email Address",
+                        icon: Icons.mail,
+                        isPasswordType: false,
+                        controller: _emailController),
                     const SizedBox(height: 15),
-                    ReusableTextField(text: "Enter Password", icon: Icons.lock, isPasswordType: true, controller: _passwordController),
+                    ReusableTextField(
+                        text: "Enter Password",
+                        icon: Icons.lock,
+                        isPasswordType: true,
+                        controller: _passwordController),
                     const SizedBox(height: 15),
-                    const Align(
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        'Forget Password',
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Color.fromARGB(255, 4, 73, 7)),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ForgetPage()));
+                      },
+                      child: const Align(
+                        alignment: Alignment.centerRight,
+                        child: Text(
+                          'Forget Password',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color.fromARGB(255, 4, 73, 7)),
+                        ),
                       ),
                     ),
                     signInSignoutbutton(context, true, () {
